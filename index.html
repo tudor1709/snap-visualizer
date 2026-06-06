@@ -1,0 +1,510 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>SNAP Path Visualizer - FTC DECODE</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Outfit:wght@100..900&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="style.css" />
+    </head>
+    <body>
+        <div class="app-container">
+            <aside class="sidebar sidebar-left">
+                <header class="app-header">
+                    <h1>SNAP Visualizer</h1>
+                    <span class="badge">FTC DECODE Season</span>
+                </header>
+
+                <section class="config-card">
+                    <h2>Physics & Constraints</h2>
+                    <div class="input-grid">
+                        <div class="input-group">
+                            <label for="maxVel">Max Velocity (in/s)</label>
+                            <input
+                                type="number"
+                                id="maxVel"
+                                value="90"
+                                step="1"
+                            />
+                        </div>
+                        <div class="input-group">
+                            <label for="maxAccel">Max Accel (in/s²)</label>
+                            <input
+                                type="number"
+                                id="maxAccel"
+                                value="200"
+                                step="10"
+                            />
+                        </div>
+                        <div class="input-group">
+                            <label for="maxDecel">Max Decel (in/s²)</label>
+                            <input
+                                type="number"
+                                id="maxDecel"
+                                value="150"
+                                step="10"
+                            />
+                        </div>
+                        <div class="input-group">
+                            <label for="tractionLimit">Traction Limit</label>
+                            <input
+                                type="number"
+                                id="tractionLimit"
+                                value="110"
+                                step="5"
+                            />
+                        </div>
+                        <div class="input-group">
+                            <label for="startVel">Start Vel (in/s)</label>
+                            <input
+                                type="number"
+                                id="startVel"
+                                value="45"
+                                step="5"
+                            />
+                        </div>
+                        <div class="input-group">
+                            <label for="endVel">End Vel (in/s)</label>
+                            <input
+                                type="number"
+                                id="endVel"
+                                value="45"
+                                step="5"
+                            />
+                        </div>
+                        <div class="input-group">
+                            <label for="driveEfficiency">Efficiency (%)</label>
+                            <input
+                                type="number"
+                                id="driveEfficiency"
+                                value="50"
+                                step="5"
+                            />
+                        </div>
+                        <div class="input-group">
+                            <label for="settlingDelay"
+                                >Settling Delay (ms)</label
+                            >
+                            <input
+                                type="number"
+                                id="settlingDelay"
+                                value="300"
+                                step="50"
+                            />
+                        </div>
+                        <div class="input-group">
+                            <label for="lookaheadRadius">Lookahead Rad (in)</label>
+                            <input
+                                type="number"
+                                id="lookaheadRadius"
+                                value="10"
+                                step="1"
+                            />
+                        </div>
+                        <div class="input-group">
+                            <label for="maxAngularVel">Max Ang Vel (rad/s)</label>
+                            <input
+                                type="number"
+                                id="maxAngularVel"
+                                value="6.0"
+                                step="0.5"
+                            />
+                        </div>
+                    </div>
+                </section>
+
+                <section class="config-card">
+                    <h2 id="pid-header" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-left: 3px solid var(--color-cyan); padding-left: 6px;">
+                        <span>PID Tuning Constants</span>
+                        <span id="pid-toggle-icon" style="font-size: 0.75rem;">▼</span>
+                    </h2>
+                    <div id="pid-tuning-grid" class="input-grid" style="display: none; margin-top: 0.75rem;">
+                        <div class="input-group">
+                            <label for="driveKpS">Drive Kp (Settle)</label>
+                            <input
+                                type="number"
+                                id="driveKpS"
+                                value="0.2"
+                                step="0.05"
+                            />
+                        </div>
+                        <div class="input-group">
+                            <label for="driveKdS">Drive Kd (Settle)</label>
+                            <input
+                                type="number"
+                                id="driveKdS"
+                                value="0.015"
+                                step="0.005"
+                            />
+                        </div>
+                        <div class="input-group">
+                            <label for="headingKp">Heading Kp</label>
+                            <input
+                                type="number"
+                                id="headingKp"
+                                value="0.7"
+                                step="0.1"
+                            />
+                        </div>
+                        <div class="input-group">
+                            <label for="headingKd">Heading Kd</label>
+                            <input
+                                type="number"
+                                id="headingKd"
+                                value="0.02"
+                                step="0.005"
+                            />
+                        </div>
+                        <div class="input-group" style="grid-column: span 2;">
+                            <label for="headingKi">Heading Ki</label>
+                            <input
+                                type="number"
+                                id="headingKi"
+                                value="0.02"
+                                step="0.005"
+                            />
+                        </div>
+                    </div>
+                </section>
+
+                <section class="config-card flex-grow">
+                    <h2>Java Code CodeGen</h2>
+                    <div class="code-container">
+                        <textarea
+                            id="java-code-io"
+                            placeholder="// Paste SNAP PathBuilder code here to import, or copy generated code..."
+                            spellcheck="false"
+                        ></textarea>
+                    </div>
+                    <div class="button-row">
+                        <button id="import-btn" class="btn btn-secondary">
+                            Import Code
+                        </button>
+                        <button id="copy-btn" class="btn btn-primary">
+                            Copy Code
+                        </button>
+                    </div>
+                </section>
+            </aside>
+
+            <main class="visualizer-main">
+                <header class="status-bar">
+                    <div class="status-item">
+                        <span class="label">Total Length:</span>
+                        <span id="total-length-val" class="value">0.0"</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="label">Estimated Time:</span>
+                        <span id="total-time-val" class="value">0.0s</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="label">State:</span>
+                        <span id="simulation-state" class="value">READY</span>
+                    </div>
+                </header>
+
+                <div class="field-container">
+                    <svg id="field-svg" viewBox="-75 -75 150 150">
+                        <defs>
+                            <pattern
+                                id="field-grid"
+                                width="24"
+                                height="24"
+                                patternUnits="userSpaceOnUse"
+                                x="-12"
+                                y="-12"
+                            >
+                                <rect
+                                    width="24"
+                                    height="24"
+                                    fill="none"
+                                    stroke="rgba(255, 255, 255, 0.05)"
+                                    stroke-width="0.3"
+                                />
+                                <circle
+                                    cx="12"
+                                    cy="12"
+                                    r="0.5"
+                                    fill="rgba(255, 255, 255, 0.15)"
+                                />
+                            </pattern>
+                            <filter
+                                id="glow-cyan"
+                                x="-20%"
+                                y="-20%"
+                                width="140%"
+                                height="140%"
+                            >
+                                <feGaussianBlur
+                                    stdDeviation="1.5"
+                                    result="blur"
+                                />
+                                <feMerge>
+                                    <feMergeNode in="blur" />
+                                    <feMergeNode in="SourceGraphic" />
+                                </feMerge>
+                            </filter>
+                            <filter
+                                id="glow-green"
+                                x="-20%"
+                                y="-20%"
+                                width="140%"
+                                height="140%"
+                            >
+                                <feGaussianBlur
+                                    stdDeviation="1.5"
+                                    result="blur"
+                                />
+                                <feMerge>
+                                    <feMergeNode in="blur" />
+                                    <feMergeNode in="SourceGraphic" />
+                                </feMerge>
+                            </filter>
+                        </defs>
+
+                        <line
+                            x1="-72"
+                            y1="0"
+                            x2="72"
+                            y2="0"
+                            stroke="rgba(255, 255, 255, 0.08)"
+                            stroke-width="0.3"
+                            stroke-dasharray="2,2"
+                        />
+                        <line
+                            x1="0"
+                            y1="-72"
+                            x2="0"
+                            y2="72"
+                            stroke="rgba(255, 255, 255, 0.08)"
+                            stroke-width="0.3"
+                            stroke-dasharray="2,2"
+                        />
+
+                        <g transform="translate(-36, -36)">
+                            
+                        </g>
+                        <g transform="translate(36, 36)">
+                            
+                        </g>
+
+                        <g id="trajectory-group"></g>
+
+                        <g id="waypoints-group"></g>
+
+                        <g
+                            id="robot-shadow"
+                            class="robot-preview"
+                            style="display: none"
+                        >
+                            <rect
+                                x="-9"
+                                y="-9"
+                                width="18"
+                                height="18"
+                                rx="2"
+                                fill="rgba(168, 85, 247, 0.15)"
+                                stroke="#a855f7"
+                                stroke-width="0.5"
+                            />
+                            <rect
+                                x="-10"
+                                y="5"
+                                width="2"
+                                height="4"
+                                fill="#a855f7"
+                            />
+                            <rect
+                                x="8"
+                                y="5"
+                                width="2"
+                                height="4"
+                                fill="#a855f7"
+                            />
+                            <rect
+                                x="-10"
+                                y="-9"
+                                width="2"
+                                height="4"
+                                fill="#a855f7"
+                            />
+                            <rect
+                                x="8"
+                                y="-9"
+                                width="2"
+                                height="4"
+                                fill="#a855f7"
+                            />
+                            <line
+                                x1="0"
+                                y1="0"
+                                x2="12"
+                                y2="0"
+                                stroke="#a855f7"
+                                stroke-width="0.8"
+                                marker-end="url(#arrow)"
+                            />
+                            <polygon points="12,0 9,-2 9,2" fill="#a855f7" />
+                        </g>
+
+                        <g
+                            id="robot-live"
+                            class="robot-preview"
+                            style="display: none"
+                        >
+                            <rect
+                                x="-9"
+                                y="-9"
+                                width="18"
+                                height="18"
+                                rx="2"
+                                fill="rgba(34, 197, 94, 0.25)"
+                                stroke="#22c55e"
+                                stroke-width="0.8"
+                                filter="url(#glow-green)"
+                            />
+                            <rect
+                                x="-10"
+                                y="5"
+                                width="2"
+                                height="4"
+                                fill="#22c55e"
+                            />
+                            <rect
+                                x="8"
+                                y="5"
+                                width="2"
+                                height="4"
+                                fill="#22c55e"
+                            />
+                            <rect
+                                x="-10"
+                                y="-9"
+                                width="2"
+                                height="4"
+                                fill="#22c55e"
+                            />
+                            <rect
+                                x="8"
+                                y="-9"
+                                width="2"
+                                height="4"
+                                fill="#22c55e"
+                            />
+                            <line
+                                x1="0"
+                                y1="0"
+                                x2="12"
+                                y2="0"
+                                stroke="#22c55e"
+                                stroke-width="1.2"
+                            />
+                            <polygon points="12,0 8,-2 8,2" fill="#22c55e" />
+                        </g>
+                    </svg>
+
+                    <div id="coord-tooltip" class="coord-tooltip">
+                        X: 0.0, Y: 0.0
+                    </div>
+                    <div class="team-signature">made by team ARRA #25538</div>
+                </div>
+
+                <footer class="simulation-bar">
+                    <button
+                        id="play-btn"
+                        class="btn btn-icon"
+                        title="Play / Pause Simulation"
+                    >
+                        <svg
+                            viewBox="0 0 24 24"
+                            width="24"
+                            height="24"
+                            fill="currentColor"
+                        >
+                            <polygon points="6,3 21,12 6,21" id="play-icon" />
+
+                            <path
+                                d="M5,21 h6 V3 H5 z M13,3 v18 h6 V3 z"
+                                id="pause-icon"
+                                style="display: none"
+                            />
+                        </svg>
+                    </button>
+                    <div class="timeline-container">
+                        <input
+                            type="range"
+                            id="timeline"
+                            min="0"
+                            max="100"
+                            value="0"
+                            step="0.1"
+                        />
+                    </div>
+                    <div class="sim-speed">
+                        <select id="sim-speed-select">
+                            <option value="0.25">0.25x</option>
+                            <option value="0.5">0.5x</option>
+                            <option value="1" selected>1.0x</option>
+                            <option value="1.5">1.5x</option>
+                            <option value="2">2.0x</option>
+                        </select>
+                    </div>
+                </footer>
+            </main>
+
+            <aside class="sidebar sidebar-right">
+                <section
+                    class="config-card flex-grow"
+                    style="
+                        display: flex;
+                        flex-direction: column;
+                        overflow: hidden;
+                        height: 100%;
+                    "
+                >
+                    <div
+                        class="card-header-actions"
+                        style="
+                            padding-bottom: 0.75rem;
+                            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                            flex-shrink: 0;
+                        "
+                    >
+                        <div class="button-row" style="gap: 0.3rem">
+                            <button
+                                id="add-waypoint-btn"
+                                class="btn btn-secondary btn-sm"
+                            >
+                                + Waypoint
+                            </button>
+                            <button
+                                id="add-lineto-btn"
+                                class="btn btn-secondary btn-sm"
+                            >
+                                + LineTo
+                            </button>
+                            <button
+                                id="clear-btn"
+                                class="btn btn-secondary btn-sm"
+                            >
+                                Clear
+                            </button>
+                        </div>
+                    </div>
+                    <div
+                        id="waypoint-list"
+                        class="waypoint-list scrollable"
+                        style="flex-grow: 1; padding-top: 0.5rem"
+                    ></div>
+                </section>
+            </aside>
+        </div>
+
+        <script src="app.js"></script>
+    </body>
+</html>
