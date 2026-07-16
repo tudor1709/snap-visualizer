@@ -865,8 +865,8 @@ function highlightActiveElements() {
 function setupEventListeners() {
     window.addEventListener('mousemove', (e) => {
         const rect = fieldSvg.getBoundingClientRect();
-        const svgX = ((e.clientX - rect.left) / rect.width) * 150 - 75;
-        const svgY = ((e.clientY - rect.top) / rect.height) * 150 - 75;
+        const svgX = ((e.clientX - rect.left) / rect.width) * 200 - 100;
+        const svgY = ((e.clientY - rect.top) / rect.height) * 200 - 100;
         const fieldCoords = svgToUser(svgX, svgY);
 
         const isOverField = (e.clientX >= rect.left && e.clientX <= rect.right &&
@@ -881,8 +881,8 @@ function setupEventListeners() {
         }
 
         if (isDraggingWpIndex !== null) {
-            const clampedX = Math.max(-72, Math.min(72, fieldCoords.x));
-            const clampedY = Math.max(-72, Math.min(72, fieldCoords.y));
+            const clampedX = Math.max(-96, Math.min(96, fieldCoords.x));
+            const clampedY = Math.max(-96, Math.min(96, fieldCoords.y));
             
             waypoints[isDraggingWpIndex].x = Math.round(clampedX * 10) / 10;
             waypoints[isDraggingWpIndex].y = Math.round(clampedY * 10) / 10;
@@ -918,8 +918,8 @@ function setupEventListeners() {
     // Double click to add waypoint
     fieldSvg.addEventListener('dblclick', (e) => {
         const rect = fieldSvg.getBoundingClientRect();
-        const svgX = ((e.clientX - rect.left) / rect.width) * 150 - 75;
-        const svgY = ((e.clientY - rect.top) / rect.height) * 150 - 75;
+        const svgX = ((e.clientX - rect.left) / rect.width) * 200 - 100;
+        const svgY = ((e.clientY - rect.top) / rect.height) * 200 - 100;
         const fieldCoords = svgToUser(svgX, svgY);
 
         const newWp = {
@@ -999,8 +999,8 @@ function setupEventListeners() {
         }
         const lastWp = waypoints[waypoints.length - 1];
         const newWp = {
-            x: Math.max(-70, Math.min(70, Math.round(lastWp.x + 15))),
-            y: Math.max(-70, Math.min(70, Math.round(lastWp.y + 15))),
+            x: Math.max(-94, Math.min(94, Math.round(lastWp.x + 15))),
+            y: Math.max(-94, Math.min(94, Math.round(lastWp.y + 15))),
             heading: lastWp.heading,
             cornerRadius: 30,
             maxSpeed: 1.0,
